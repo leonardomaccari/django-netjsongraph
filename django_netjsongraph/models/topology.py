@@ -73,11 +73,10 @@ class BaseTopology(TimeStampedEditableModel):
         nodes = []
         links = []
         # populate graph
-        #latest_update = models.Update.all().order_by('timestamp')[-1]
-        #for link in self.link_set.select_related('source', 'target').filter(update=latest_update):
         from . import Update  # avoid circular dependency
         latest_update = Update.objects.latest('timestamp')
-        for link in self.link_set.select_related('source', 'target').filter(update_id=latest_update):
+        for link in self.link_set.select_related('source', 'target').\
+                filter(update_id=latest_update):
             links.append(link.json(dict=True))
         for node in self.node_set.all().filter(update_id=latest_update):
             nodes.append(node.json(dict=True))
