@@ -45,10 +45,27 @@ class BaseTopology(TimeStampedEditableModel):
     def latest(self):
         return self.parser_class(self.url, timeout=5)
 
-    def diff(self):
+    def diff(self, store_new):
         """ shortcut to netdiff.diff """
         latest = self.latest
-        current = NetJsonParser(self.json(dict=True))
+        if store_new:
+            current = NetJsonParser(
+                OrderedDict((
+                            ('type', 'NetworkGraph'),
+                            ('protocol', self.parser_class.protocol),
+                            ('version', self.parser_class.version),
+                            ('metric', self.parser_class.metric),
+                            ('label', self.label),
+                            ('id', str(self.id)),
+                            ('parser', self.parser),
+                            ('created', self.created),
+                            ('modified', self.modified),
+                            ('nodes', []),
+                            ('links', [])
+                            ))
+                )
+        else:
+            current = NetJsonParser(self.json(dict=True))
         return diff(current, latest)
 
     def json(self, dict=False, **kwargs):
@@ -56,9 +73,13 @@ class BaseTopology(TimeStampedEditableModel):
         nodes = []
         links = []
         # populate graph
-        for link in self.link_set.select_related('source', 'target'):
+        #latest_update = models.Update.all().order_by('timestamp')[-1]
+        #for link in self.link_set.select_related('source', 'target').filter(update=latest_update):
+        from . import Update  # avoid circular dependency
+        latest_update = Update.objects.latest('timestamp')
+        for link in self.link_set.select_related('source', 'target').filter(update_id=latest_update):
             links.append(link.json(dict=True))
-        for node in self.node_set.all():
+        for node in self.node_set.all().filter(update_id=latest_update):
             nodes.append(node.json(dict=True))
         netjson = OrderedDict((
             ('type', 'NetworkGraph'),
@@ -77,16 +98,25 @@ class BaseTopology(TimeStampedEditableModel):
             return netjson
         return json.dumps(netjson, cls=JSONEncoder, **kwargs)
 
-    def update(self):
+    def update(self, store_new=True):
         """
         Updates topology
         Links are not deleted straightaway but set as "down"
         """
         from . import Link, Node, Update  # avoid circular dependency
-        diff = self.diff()
-        u = Update()
-        u.save()
+        u = None
+        updates = Update.objects.all()
+        if updates:
+            if store_new:
+                u = Update()
+                u.save()
+            else:
+                u = updates[0]
+        else:
+            u = Update()
+            u.save()
 
+        diff = self.diff(store_new)
 
         status = {
             'added': 'up',
@@ -105,15 +135,16 @@ class BaseTopology(TimeStampedEditableModel):
             added_nodes = []
 
         for node_dict in added_nodes:
-            node = Node.count_address(node_dict['id'])
-            if node:  # pragma no cover
-                continue
+            if not store_new:
+                node = Node.count_address(node_dict['id'])
+                if node:  # pragma no cover
+                    continue
             addresses = '{0};'.format(node_dict['id'])
             addresses += ';'.join(node_dict.get('local_addresses', []))
             properties = node_dict.get('properties', {})
             node = Node(addresses=addresses,
                         properties=properties,
-                        topology=self)
+                        topology=self, update=u)
             node.full_clean()
             node.save()
 
@@ -125,14 +156,14 @@ class BaseTopology(TimeStampedEditableModel):
                 changed = False
                 link = Link.get_from_nodes(link_dict['source'],
                                            link_dict['target'])
-                if not link:
+                if not link or store_new:
                     source = Node.get_from_address(link_dict['source'])
                     target = Node.get_from_address(link_dict['target'])
                     link = Link(source=source,
                                 target=target,
                                 cost=link_dict['cost'],
                                 properties=link_dict.get('properties', {}),
-                                topology=self)
+                                topology=self, update=u)
                     changed = True
                 # links in changed and removed sections
                 # are always changing therefore needs to be saved

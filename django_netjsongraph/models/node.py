@@ -17,6 +17,7 @@ class BaseNode(TimeStampedEditableModel):
     NetJSON NetworkGraph Node Object implementation
     """
     topology = models.ForeignKey('django_netjsongraph.Topology')
+    update = models.ForeignKey('django_netjsongraph.Update')
     label = models.CharField(max_length=64, blank=True)
     # netjson ID and local_addresses
     addresses = models.CharField(max_length=255, db_index=True)
