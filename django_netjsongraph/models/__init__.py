@@ -1,6 +1,7 @@
 from .topology import BaseTopology
 from .node import BaseNode
 from .link import BaseLink
+from .update import Update
 
 
 class Topology(BaseTopology):

@@ -82,8 +82,11 @@ class BaseTopology(TimeStampedEditableModel):
         Updates topology
         Links are not deleted straightaway but set as "down"
         """
-        from . import Link, Node  # avoid circular dependency
+        from . import Link, Node, Update  # avoid circular dependency
         diff = self.diff()
+        u = Update()
+        u.save()
+
 
         status = {
             'added': 'up',
