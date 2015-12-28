@@ -117,7 +117,7 @@ class BaseTopology(TimeStampedEditableModel):
             u = Update()
             u.save()
 
-        diff = self.diff(store_new)
+        diff = self.diff()
 
         status = {
             'added': 'up',
