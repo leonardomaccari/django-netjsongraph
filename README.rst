@@ -37,6 +37,7 @@ Current features:
     - CNML 1.0
 * **visualizer** based on `netjsongraph.js <https://github.com/interop-dev/netjsongraph.js>`_
 * **simple HTTP API** that exposes data in `NetJSON <http://netjson.org>`__ *NetworkGraph* format
+* possibility to store a history of previous snapshots
 
 Install stable version from pypi
 --------------------------------
@@ -123,14 +124,16 @@ For a good default ``LOGGING`` configuration refer to the `test settings
 Settings
 --------
 
-+---------------------------------+-------------------------------------+---------------------------------------------------------------------------------------------------+
-| Setting                         | Default value                       | Description                                                                                       |
-+=================================+=====================================+===================================================================================================+
-| ``NETJSONGRAPH_PARSERS``        | ``[]``                              | List with additional custom `netdiff parsers <https://github.com/ninuxorg/netdiff#parsers>`_      |
-+---------------------------------+-------------------------------------+---------------------------------------------------------------------------------------------------+
-| ``NETJSONGRAPH_SIGNALS``        | ``None``                            | String representing python module to import on initialization.                                    |
-|                                 |                                     | Useful for loading django signals or to define custom behaviour.                                  |
-+---------------------------------+-------------------------------------+---------------------------------------------------------------------------------------------------+
++--------------------------------------+-------------------------------------+---------------------------------------------------------------------------------------------------+
+| Setting                              | Default value                       | Description                                                                                       |
++======================================+=====================================+===================================================================================================+
+| ``NETJSONGRAPH_PARSERS``             | ``[]``                              | List with additional custom `netdiff parsers <https://github.com/ninuxorg/netdiff#parsers>`_      |
++--------------------------------------+-------------------------------------+---------------------------------------------------------------------------------------------------+
+| ``NETJSONGRAPH_SIGNALS``             | ``None``                            | String representing python module to import on initialization.                                    |
+|                                      |                                     | Useful for loading django signals or to define custom behaviour.                                  |
++--------------------------------------+-------------------------------------+---------------------------------------------------------------------------------------------------+
+| ``NETJSONGRAPH_UPDATE_HISTORY_LEN``  | ``0``                               | Number of snapshots that the app will store, 0 means the snapshot is always rewritten             |
++--------------------------------------+-------------------------------------+---------------------------------------------------------------------------------------------------+
 
 Installing for development
 --------------------------
