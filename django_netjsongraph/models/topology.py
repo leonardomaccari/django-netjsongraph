@@ -12,6 +12,7 @@ from netdiff import diff, NetJsonParser
 
 from ..base import TimeStampedEditableModel
 from ..settings import PARSERS
+from ..settings import UPDATE_HISTORY_LEN
 from ..contextmanagers import log_on_fail
 
 
@@ -45,10 +46,10 @@ class BaseTopology(TimeStampedEditableModel):
     def latest(self):
         return self.parser_class(self.url, timeout=5)
 
-    def diff(self, store_new):
+    def diff(self):
         """ shortcut to netdiff.diff """
         latest = self.latest
-        if store_new:
+        if UPDATE_HISTORY_LEN:
             current = NetJsonParser(
                 OrderedDict((
                             ('type', 'NetworkGraph'),
@@ -97,7 +98,7 @@ class BaseTopology(TimeStampedEditableModel):
             return netjson
         return json.dumps(netjson, cls=JSONEncoder, **kwargs)
 
-    def update(self, store_new=True):
+    def update(self):
         """
         Updates topology
         Links are not deleted straightaway but set as "down"
@@ -105,6 +106,7 @@ class BaseTopology(TimeStampedEditableModel):
         from . import Link, Node, Update  # avoid circular dependency
         u = None
         updates = Update.objects.all()
+        store_new = UPDATE_HISTORY_LEN
         if updates:
             if store_new:
                 u = Update()
@@ -156,8 +158,10 @@ class BaseTopology(TimeStampedEditableModel):
                 link = Link.get_from_nodes(link_dict['source'],
                                            link_dict['target'])
                 if not link or store_new:
-                    source = Node.get_from_address(link_dict['source'])
-                    target = Node.get_from_address(link_dict['target'])
+                    source = Node.get_from_address_and_update(
+                        link_dict['source'], u.id)
+                    target = Node.get_from_address_and_update(
+                        link_dict['target'], u.id)
                     link = Link(source=source,
                                 target=target,
                                 cost=link_dict['cost'],
@@ -175,3 +179,5 @@ class BaseTopology(TimeStampedEditableModel):
                     with log_on_fail(action[section], link):
                         link.full_clean()
                         link.save()
+        if store_new:
+            Update().cleanup()

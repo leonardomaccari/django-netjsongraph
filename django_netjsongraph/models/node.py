@@ -98,6 +98,19 @@ class BaseNode(TimeStampedEditableModel):
         return cls.objects.filter(addresses__contains=address).first()
 
     @classmethod
+    def get_from_address_and_update(cls, address, update_id):
+        """
+        Find node from one of its addresses and an update_id.
+        :param address: string
+        :param node_id: int
+        :returns: Node object or None
+        """
+        address = '{0};'.format(address)
+        return cls.objects.filter(addresses__contains=address,
+                                  update_id=update_id).first()
+
+
+    @classmethod
     def count_address(cls, address):
         """
         Count nodes with the specified address.
