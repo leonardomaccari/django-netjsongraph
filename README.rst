@@ -19,7 +19,7 @@ django-netjsongraph
 
 ------------
 
-Reusable django app for collecting and visualizing network topology.
+Modified `django_netjsongraph <https://github.com/interop-dev/django-netjsongraph>`_ to store a history of saved graphs.
 
 .. image:: https://raw.githubusercontent.com/interop-dev/django-netjsongraph/master/docs/images/visualizer.png
 
