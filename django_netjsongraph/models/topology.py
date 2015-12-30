@@ -105,17 +105,17 @@ class BaseTopology(TimeStampedEditableModel):
         """
         from . import Link, Node, Update  # avoid circular dependency
         u = None
-        updates = Update.objects.all()
+        last_update = Update.objects.last()
         store_new = UPDATE_HISTORY_LEN
-        if updates:
+        if last_update:
             if store_new:
                 u = Update()
                 u.save()
             else:
-                u = updates[0]
+                u = last_update
         else:
             u = Update()
-            u.save()
+        u.save()
 
         diff = self.diff()
 
