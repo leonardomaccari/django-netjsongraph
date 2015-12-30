@@ -104,5 +104,5 @@ class TestNode(TestCase):
         Node.objects.create(addresses='192.168.0.1,10.0.0.1',
                             topology=Topology.objects.first(),
                             update=Update.objects.last())
-        self.assertEqual(Node.count_address('192.168.0.1'), 1)
+        self.assertEqual(Node.count_address('192.168.0.1'), 2)
         self.assertEqual(Node.count_address('0.0.0.0'), 0)

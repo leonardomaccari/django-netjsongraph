@@ -3,7 +3,7 @@ from ..settings import UPDATE_HISTORY_LEN
 
 
 class Update(models.Model):
-    timestamp = models.DateTimeField(auto_now_add=True,
+    timestamp = models.DateTimeField(auto_now=True,
                                      blank=False)
 
     class Meta():
@@ -14,7 +14,7 @@ class Update(models.Model):
 
     def cleanup(self):
         old_updates = Update.objects.all()
-        if len(old_updates) < UPDATE_HISTORY_LEN:
+        if len(old_updates) < UPDATE_HISTORY_LEN or not UPDATE_HISTORY_LEN:
             return
         for up in old_updates[:len(old_updates) - UPDATE_HISTORY_LEN]:
             up.delete()

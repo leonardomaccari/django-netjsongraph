@@ -1,26 +1,65 @@
 [
-    {
-        "pk":"d083b494-8e16-4054-9537-fb9eba914861",
-        "model":"django_netjsongraph.node",
-        "fields":{
-            "label":"node1",
-            "topology":"a083b494-8e16-4054-9537-fb9eba914861",
-            "addresses": "192.168.0.1;",
-            "created":"2015-05-16T20:02:52.483Z",
-            "modified":"2015-05-16T19:33:41.621Z",
-            "properties": {}
-        }
-    },
-    {
-        "pk":"d083b494-8e16-4054-9537-fb9eba914862",
-        "model":"django_netjsongraph.Node",
-        "fields":{
-            "label":"node2",
-            "topology":"a083b494-8e16-4054-9537-fb9eba914861",
-            "addresses": "192.168.0.2;",
-            "created":"2015-05-16T20:02:52.483Z",
-            "modified":"2015-05-16T19:33:41.621Z",
-            "properties": {}
-        }
+{
+    "model": "django_netjsongraph.update",
+    "pk": 56,
+    "fields": {
+        "timestamp": "2015-12-29T10:08:21.408Z"
     }
+},
+{
+    "model": "django_netjsongraph.topology",
+    "pk": "0b876cac-1a94-49fa-b90a-8c0df1039a4d",
+    "fields": {
+        "created": "2015-12-28T12:17:34.636Z",
+        "modified": "2015-12-28T12:17:34.872Z",
+        "label": "ninux_firenze_netjson",
+        "parser": "netdiff.NetJsonParser",
+        "url": "http://127.0.0.1:9090",
+        "protocol": "",
+        "version": "",
+        "revision": "",
+        "metric": ""
+    }
+},
+{
+    "model": "django_netjsongraph.node",
+    "pk": "5588138d-9f4f-4aef-8a95-64c844456de3",
+    "fields": {
+        "created": "2015-12-29T10:08:22.158Z",
+        "modified": "2015-12-29T10:08:22.161Z",
+        "topology": "0b876cac-1a94-49fa-b90a-8c0df1039a4d",
+        "update": 56,
+        "label": "",
+        "addresses": "192.168.0.2;",
+        "properties": "{}"
+    }
+},
+{
+    "model": "django_netjsongraph.node",
+    "pk": "ba19f510-18e3-40e5-abb7-67de305e6655",
+    "fields": {
+        "created": "2015-12-29T10:08:21.950Z",
+        "modified": "2015-12-29T10:08:21.955Z",
+        "topology": "0b876cac-1a94-49fa-b90a-8c0df1039a4d",
+        "update": 56,
+        "label": "",
+        "addresses": "192.168.0.1;",
+        "properties": "{}"
+    }
+},
+{
+    "model": "django_netjsongraph.link",
+    "pk": "029fa443-46fd-459b-802d-2a9c614deb9a",
+    "fields": {
+        "created": "2015-12-29T10:08:22.357Z",
+        "modified": "2015-12-29T10:08:22.360Z",
+        "topology": "0b876cac-1a94-49fa-b90a-8c0df1039a4d",
+        "source": "ba19f510-18e3-40e5-abb7-67de305e6655",
+        "target": "5588138d-9f4f-4aef-8a95-64c844456de3",
+        "update": 56,
+        "cost": 1.0,
+        "cost_text": "100mbit/s",
+        "status": "up"
+    }
+}
 ]
