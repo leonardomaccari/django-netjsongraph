@@ -5,9 +5,9 @@ import responses
 
 from django.test import TestCase
 from django.core.management import call_command
-from netdiff import OlsrParser
+from netdiff import OlsrParser, NetJsonParser
 
-from ..models import Topology, Link, Node
+from ..models import Topology, Link, Node, Update
 from ..utils import update_topology
 from .utils import StringIO, redirect_stdout
 
@@ -17,7 +17,6 @@ class TestTopology(TestCase):
     tests for Topology model
     """
     fixtures = [
-        'test_topologies.json',
         'test_nodes.json'
     ]
     maxDiff = None
@@ -35,7 +34,7 @@ class TestTopology(TestCase):
 
     def test_parser(self):
         t = Topology.objects.first()
-        self.assertIs(t.parser_class, OlsrParser)
+        self.assertIs(t.parser_class, NetJsonParser)
 
     def test_json_empty(self):
         t = Topology.objects.first()
@@ -43,9 +42,9 @@ class TestTopology(TestCase):
         graph = t.json(dict=True)
         self.assertDictEqual(graph, {
             'type': 'NetworkGraph',
-            'protocol': 'OLSR',
-            'version': '0.8',
-            'metric': 'ETX',
+            'protocol': None,
+            'version': None,
+            'metric': None,
             'label': t.label,
             'id': str(t.id),
             'parser': t.parser,
@@ -58,17 +57,22 @@ class TestTopology(TestCase):
     def test_json(self):
         node1, node2 = self._get_nodes()
         t = Topology.objects.first()
-        node3 = Node.objects.create(topology=t, addresses='192.168.0.3', label='node3')
+        node3 = Node.objects.create(topology=t, 
+                                    addresses='192.168.0.3', 
+                                    label='node3',
+                                    update=Update.objects.last())
         l = Link.objects.create(topology=t, source=node1,
-                                target=node2, cost=1)
+                                target=node2, cost=1,
+                                update=Update.objects.last())
         l2 = Link.objects.create(topology=t, source=node1,
-                                 target=node3, cost=1)
+                                 target=node3, cost=1,
+                                 update=Update.objects.last())
         graph = t.json(dict=True)
         self.assertDictEqual(dict(graph), {
             'type': 'NetworkGraph',
-            'protocol': 'OLSR',
-            'version': '0.8',
-            'metric': 'ETX',
+            'protocol': None,
+            'version': None,
+            'metric': None,
             'label': t.label,
             'id': str(t.id),
             'parser': t.parser,
