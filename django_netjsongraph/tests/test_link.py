@@ -2,7 +2,7 @@ import six
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 
-from ..models import Link, Node, Topology
+from ..models import Link, Node, Topology, Update
 
 
 class TestLink(TestCase):
@@ -10,30 +10,32 @@ class TestLink(TestCase):
     tests for Link model
     """
     fixtures = [
-        'test_topologies.json',
         'test_nodes.json'
     ]
 
     def test_str(self):
-        l = Link(topology_id="a083b494-8e16-4054-9537-fb9eba914861",
-                 source_id="d083b494-8e16-4054-9537-fb9eba914861",
-                 target_id="d083b494-8e16-4054-9537-fb9eba914862",
+        l = Link(topology_id="0b876cac-1a94-49fa-b90a-8c0df1039a4d",
+                 source_id="ba19f510-18e3-40e5-abb7-67de305e6655",
+                 target_id="5588138d-9f4f-4aef-8a95-64c844456de3",
+                 update_id=56,
                  cost=1.0)
         self.assertIsInstance(str(l), str)
 
     def test_clean_properties(self):
-        l = Link(topology_id="a083b494-8e16-4054-9537-fb9eba914861",
-                 source_id="d083b494-8e16-4054-9537-fb9eba914861",
-                 target_id="d083b494-8e16-4054-9537-fb9eba914862",
+        l = Link(topology_id="0b876cac-1a94-49fa-b90a-8c0df1039a4d",
+                 source_id="ba19f510-18e3-40e5-abb7-67de305e6655",
+                 target_id="5588138d-9f4f-4aef-8a95-64c844456de3",
                  cost=1.0,
+                 update_id=56,
                  properties=None)
         l.full_clean()
         self.assertEqual(l.properties, {})
 
     def test_same_source_and_target_id(self):
-        l = Link(topology_id="a083b494-8e16-4054-9537-fb9eba914861",
-                 source_id="d083b494-8e16-4054-9537-fb9eba914861",
-                 target_id="d083b494-8e16-4054-9537-fb9eba914861",
+        l = Link(topology_id="0b876cac-1a94-49fa-b90a-8c0df1039a4d",
+                 source_id="ba19f510-18e3-40e5-abb7-67de305e6655",
+                 target_id="ba19f510-18e3-40e5-abb7-67de305e6655",
+                 update_id=56,
                  cost=1)
         with self.assertRaises(ValidationError):
             l.full_clean()
@@ -43,16 +45,19 @@ class TestLink(TestCase):
         l = Link(topology=Topology.objects.first(),
                  source=node,
                  target=node,
+                 update=Update.objects.last(),
                  cost=1)
         with self.assertRaises(ValidationError):
             l.full_clean()
 
     def test_json(self):
-        l = Link(topology_id="a083b494-8e16-4054-9537-fb9eba914861",
-                 source_id="d083b494-8e16-4054-9537-fb9eba914861",
-                 target_id="d083b494-8e16-4054-9537-fb9eba914862",
+        self.maxDiff = None
+        l = Link(topology_id="0b876cac-1a94-49fa-b90a-8c0df1039a4d",
+                 source_id="ba19f510-18e3-40e5-abb7-67de305e6655",
+                 target_id="5588138d-9f4f-4aef-8a95-64c844456de3",
                  cost=1.0,
                  cost_text='100mbit/s',
+                 update_id=56,
                  properties='{"pretty": true}')
         self.assertEqual(dict(l.json(dict=True)), {
             'source': '192.168.0.1',
@@ -69,11 +74,12 @@ class TestLink(TestCase):
         self.assertIsInstance(l.json(), six.string_types)
 
     def test_get_from_nodes(self):
-        l = Link(topology_id="a083b494-8e16-4054-9537-fb9eba914861",
-                 source_id="d083b494-8e16-4054-9537-fb9eba914861",
-                 target_id="d083b494-8e16-4054-9537-fb9eba914862",
+        l = Link(topology_id="0b876cac-1a94-49fa-b90a-8c0df1039a4d",
+                 source_id="ba19f510-18e3-40e5-abb7-67de305e6655",
+                 target_id="5588138d-9f4f-4aef-8a95-64c844456de3",
                  cost=1.0,
                  cost_text='100mbit/s',
+                 update_id=56,
                  properties='{"pretty": true}')
         l.full_clean()
         l.save()
